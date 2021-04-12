@@ -1,0 +1,28 @@
+public class IncidentReportTriggerHandler {
+    
+    public void afterInsertMethod(List<Incident__c> ids){
+    
+    
+    
+	List<Action_Order__c> assignedOrdersToProcess = new List<Action_Order__c>();
+ 
+	List<Incident__c> newIncidentsCreated = [SELECT id, DEPARTMENT__c FROM Incident__c WHERE ID IN :ids];
+    
+	for (Incident__c ir : newIncidentsCreated){
+		String irdept = ir.Department__c;
+		if (irdept == 'Quality Control'){
+            Action_Order__c qc = new Action_Order__c();
+            qc.Assigned_To__c='Quality Control';
+            assignedOrdersToProcess.add(qc);
+           }
+	
+        if(irdept == 'Safety Team'){
+            Action_Order__c st = new Action_Order__c();
+            st.Assigned_To__c = 'Safety Team';
+            assignedOrdersToProcess.add(st);
+           }
+		}
+			insert assignedOrdersToProcess;
+
+    }
+}
