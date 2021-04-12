@@ -1,0 +1,38 @@
+//Abdulloh Yoldoshev
+//Handler class for Ban triggers
+//updated 04/11/2021
+public class BanTriggerHandler {
+    
+    //method to add 10 days if contact already has a ban
+    public static List<Ban__c> checkForExistingBans (List<Ban__c> listOfBans){
+        //list of Contact names that already have bans
+        List<String> listOfContactsNames = new List<String>();
+        for(Ban__c b: [SELECT name FROM Ban__c]){
+            Contact contact = [SELECT name FROM Contact WHERE ID=:b.Contact__c];
+            listOfContactsNames.add(contact.Name);
+        }
+        
+        //Check contact name of new bans and add 10 days to duration if they have a ban already.
+        for(Ban__c b: listOfBans){
+            Contact contact = [SELECT name FROM Contact WHERE ID=:b.Contact__c];
+            if(listOfContactsNames.contains(contact.name)){
+                b.Banned_Until__c.addDays(10);
+            }
+        }
+        return listOfBans;
+    }
+    
+    //method to add to the contact's ban count
+    public static void addToBanCount(List<Ban__c> listOfBans){
+        List<Contact> listOfContacts = new List<Contact>();
+        
+        //add 1 to each contacts banCount field and update database
+        for(Ban__c b: listOfBans){
+            Contact contact = new Contact();
+            contact.Id = b.Contact__c;
+            contact.Ban_Count__c++;
+            listOfContacts.add(contact);
+        }
+        upsert(listOfContacts);
+    }
+}
