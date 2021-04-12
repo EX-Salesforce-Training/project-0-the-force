@@ -1,0 +1,12 @@
+@isTest
+public class AccountCreatedTest {
+    @isTest static void emailTest(){
+        Account acctTest = new Account(Name = 'Tester', Priority__c= 1 );
+        insert acctTest;
+        Integer checkNumEmail = Limits.getEmailInvocations();
+        System.assertEquals(1, checkNumEmail);
+        
+    }
+    
+
+}
