@@ -1,0 +1,40 @@
+trigger CancelBeforeFiring on Employee__c (before delete){
+    CancelBeforeFiringHandler handler = new CancelBeforeFiringHandler();
+    CancelBeforeFiringHandler.CancelBeforeFiringHandlerMethod();
+}
+
+public class CancelBeforeFiringHandler{
+    public static void CancelBeforeFiringHandlerMethod(){
+    	//Select Employees from Trigger.old who are assigned to Appointment Slots
+    	for (Employee__c empl : 
+         	[SELECT Id FROM Employee__c WHERE Id IN (SELECT Employee__c 
+         	FROM Appointment_Slot__c) AND Id IN :Trigger.old]){
+             	Trigger.oldMap.get(empl.Id).addError(
+             	'You must cancel all Appointment Slots before deleting an Employee.');
+    	}
+    }
+}
+
+@istest
+private class TestCancelBeforeFiring {
+    @istest static void testErrorMessage(){
+        
+         // Create an Employee with an assigned Appointment, and then try to delete them
+        Employee__c empl0 = new Employee__c(Name='Test Employee');
+        insert empl0;
+        Client__c clnt0 = new Client__c(Name='Test Client');
+        insert clnt0;
+        Appointment_Slot__c appt0 = new Appointment_Slot__c(Client__c=clnt0.id,Employee__c=empl0.id);
+        insert appt0;
+        
+        Test.startTest();
+        Database.DeleteResult result = Database.delete(empl0, false);
+        Test.stopTest();
+        
+        // Verify that trigger returned error
+        System.assert(!result.isSuccess());
+        System.assert(result.getErrors().size() > 0);
+        System.assertEquals('You must cancel all Appointment Slots before deleting an Employee.',
+                             result.getErrors()[0].getMessage());
+    }
+}
