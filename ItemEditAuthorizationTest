@@ -1,0 +1,25 @@
+@isTest
+public class EditAuthorizationTest {
+    @isTest static void editTest(){
+        
+        //Because this only works on existing records, I need to create a record, have it persist in DB, then try to update it
+        //and have this update transaction throw the error
+        
+        Item__c newItem = new Item__c();
+        newItem.Edit_Info_Authorized__c = false;
+        newItem.Name = 'trigger test item';
+        newItem.Cost_per_Unit__c = 2;
+        newItem.Weight_by_Unit__c = 2;
+        
+        insert newItem;
+        
+        
+        newItem.Item_Description__c = 'test the update block';
+        
+        try{
+            update newItem;}
+        catch(dmlexception failure){
+            system.assert(true);
+        }
+    }
+}
