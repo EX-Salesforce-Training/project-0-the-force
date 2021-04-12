@@ -1,0 +1,61 @@
+//Abdulloh Yoldoshev
+//Test for increase duration of ban method in ban trigger
+//Updated 04/11/2021
+@isTest
+public class BanTriggerTest {
+    
+    @isTest public static void SingleTest(){
+        //create contact, a single ban that shouldnt increase duration, and a single contact that should
+        Contact testContact = new Contact(firstname='Test', lastname = 'Test');
+        Datetime bannedUntil = Datetime.newInstance(2021, 7, 10);
+        
+        //insert ban that shouldnt increase and check
+        Ban__c negativeBan = new Ban__c(Banned_Until__c=bannedUntil);
+        insert negativeBan;
+        System.assertEquals(bannedUntil, negativeBan.Banned_Until__c);
+        
+        //insert ban that should increase and check 
+        Ban__c positiveBan = new Ban__c(Contact__c=testContact.id, Banned_Until__c=bannedUntil);
+        insert positiveBan;
+        System.assertEquals(bannedUntil.addDays(10), positiveBan.Banned_Until__c);
+    }
+    
+    @isTest public static void bulkTest(){
+        //declare list of contacts, bans that shouldnt increase, bans that should increase, and a datetime
+        Datetime bannedUntil = Datetime.newInstance(2021, 7, 10);
+        List<Contact> listOfContacts = new List<Contact>();
+        List<Ban__c> listOfNegativeBans = new List<Ban__c>();
+        List<Ban__c> listOfPositiveBans = new List<Ban__c>();
+        
+        //create lists
+        for(Integer i = 0; i<150; i++){
+            Contact contact = new Contact(firstname = 'FName'+i, lastname = 'LName'+i);
+            Ban__c negativeBan = new Ban__c(Banned_Until__c=bannedUntil.addDays(i));
+            Ban__c positiveBan = new Ban__c(Contact__c=contact.id, Banned_Until__c=bannedUntil.addDays(i));
+            listOfContacts.add(contact);
+            listOfNegativeBans.add(negativeBan);
+            listOfPositiveBans.add(positiveBan);
+        }
+        //insert list of contacts and negative bans, check each ban if duration is correct
+        insert listOfContacts;
+        insert listOfNegativeBans;
+        Integer flag = 0;
+        for(Integer i =0; i<150; i++){
+            if((listOfNegativeBans[i].Banned_Until__c.addDays(i) != BannedUntil.addDays(i))){
+                flag++;
+           }
+         }
+        
+        System.assertEquals(0, flag);
+        
+        //insert positive bans, check each duration to see if its 10 days more
+        insert listOfPositiveBans;
+        flag = 0;
+        for(Integer i =0; i<150; i++){
+            if(listOfPositiveBans[i].Banned_Until__c.addDays(i) != BannedUntil.addDays(i+10)){
+                flag++;
+            }
+        }
+        System.assertEquals(0, flag);
+    }
+}
