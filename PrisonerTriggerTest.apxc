@@ -1,8 +1,69 @@
 @isTest
 public class PrisonerTriggerTest {
+    
+    @testSetup private static void prisonerSetup(){
+       
+        //Create Users to assign as test guards
+        List<User> testUsers = new List<User>();
+        Profile p = [SELECT Id FROM Profile WHERE Name='Standard User'];
+        
+        for (integer i = 0; i<5; i++){
+          User u = new User(Alias = 'User' + i, 
+                   Email= 'User' + i + '@cunning-fox-wrr40n.com', 
+                   EmailEncodingKey='UTF-8', 
+                   LastName='Testing', 
+                   LanguageLocaleKey='en_US', 
+                   LocaleSidKey='en_US', 
+                   ProfileId = p.Id, 
+                   TimeZoneSidKey='America/New_York', 
+                   UserName= 'User' + i + '@cunning-fox-wrr40n.com');
+            testUsers.add(u);
+        }
+        insert testUsers;
+        
+        //Create Test Guard assignments
+        List<Dungeon_Guard__c> testGuards = new List<Dungeon_Guard__c>();
+        List<User> newUsers = [SELECT Id FROM User WHERE Alias='User%'];
+        
+        for (User u: newUsers){
+            Dungeon_Guard__c g = new Dungeon_Guard__c(Name = u.LastName,
+                                                      Name__c = u.id,
+                                                      Dungeon__c = 'a015Y00000zASBMQA4');
+            testGuards.add(g);
+        }
+        insert testGuards;
+        
+        //Create Test Prisoners for shift assignments
+        List<Prisoner__c> testPrisoners = new List<Prisoner__c>();
+
+        for (integer i = 0; i<5; i++){
+          Prisoner__c newP = new Prisoner__c(Status__c='Incarcerated',
+                                          First_Name__c ='Prisoner',
+                                          Last_Name__c ='Number'+ i,
+                                          Dungeon__c = 'a015Y00000zASBMQA4',
+                                          Start_Date__c = System.today()-i);
+          testPrisoners.add(newP);
+        }
+        insert testPrisoners;
+        
+        //Create Test Shifts to test guard availability
+        List<Prisoner__c> newPrisoners = [SELECT Id FROM Prisoner__c WHERE Last_Name__c='Number %'];
+        List<Dungeon_Guard__c> newGuards = [SELECT Id FROM Dungeon_Guard__c WHERE Name='Testing'];
+        
+        List<Guard_Shift__c> testShifts = new List<Guard_Shift__c>();
+        
+        for(integer i = 0; i<newPrisoners.size(); i++){
+            new Guard_Shift__c(Start_Date__c = System.today() - i,
+                               Prisoner__c = newPrisoners[i].id,
+                               Dungeon_Guard__c = newGuards[i].id,
+                               Status__c = 'In Progress');                             
+        }
+            
+    }
+    
     @isTest static void testNewPrisoner(){
         
-        List<Prisoner__c> testPrisoners = new List<Prisoner__c> {
+        List<Prisoner__c> newPrisoners = new List<Prisoner__c> {
             new Prisoner__c(First_Name__c='William', 
                             Last_Name__c='Overbeck', 
                             Start_Date__c=System.today(),
@@ -16,15 +77,10 @@ public class PrisonerTriggerTest {
                             Start_Date__c=System.today()+10,
                            	Status__c='In-Processing')
         };
-        
-        //Create Test Guards to test availability
-        List<Dungeon_Guard__c> testGuards = new List<Dungeon_Guard__c>();
-        /* Guards will need a user assigned. And some will need to be 
-         * assigned to a shift to test if the availability validation works
-         */    
-        
-        insert testPrisoners;
             
+        insert newPrisoners;
+            
+        //This will need to be changed to check if NEW shifts were created.
         List<Guard_Shift__c> actualShifts = [SELECT Id FROM Guard_Shift__c];
         
         System.assertEquals(3, actualShifts.size());
