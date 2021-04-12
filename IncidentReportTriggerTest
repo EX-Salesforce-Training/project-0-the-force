@@ -1,0 +1,24 @@
+@isTest
+public class IRTriggerTest {
+    @isTest static void qcTest(){
+        
+        Incident__c qc = new Incident__c();
+        qc.Department__c = 'Quality Control';
+        insert qc;
+        
+		List<Action_Order__c> actOrd = [SELECT id FROM Action_Order__c WHERE Assigned_To__c = 'Quality Control'];
+        
+        System.assertEquals(1, actOrd.size());
+    }
+    @isTest static void stTest(){
+        Incident__c st = new Incident__c();
+        st.Department__c = 'Safety Team';
+        insert st;
+        
+        List<Action_Order__c> actOrd2 = [SELECT id FROM Action_Order__c WHERE Assigned_To__c = 'Safety Team'];
+        System.assertEquals(1, actOrd2.size());
+    }
+
+}
+
+//at this point we have 100% code coverage for IncidentReportTrigger
