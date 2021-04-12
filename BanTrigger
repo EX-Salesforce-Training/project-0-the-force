@@ -1,0 +1,28 @@
+//Abdulloh Yoldoshev
+//Trigger for Ban 
+//updated 04/11/2021
+trigger BanTrigger on Ban__c (before insert, after insert) {
+switch on trigger.operationType{
+        when BEFORE_INSERT{
+            BanTriggerHandler.checkForExistingBans(trigger.new);
+        }
+        when BEFORE_UPDATE{
+            
+        }
+        When BEFORE_DELETE{
+            
+        }
+        when AFTER_INSERT{
+            BanTriggerHandler.addToBanCount(trigger.new);
+        }
+        when AFTER_UPDATE{
+            
+        }
+        when AFTER_DELETE{
+            
+        }
+        when AFTER_UNDELETE{
+            
+        }
+    }
+}
