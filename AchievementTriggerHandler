@@ -1,0 +1,23 @@
+//Handler for Achievement triggers
+public class AchievementTriggerHandler {
+    
+    //Checks database if there is already an achievement with the same name as the one being added
+    public static List<Achievement__c> checkForExisting(List<Achievement__C> listOfAchievements){
+        Set<String> existingAchievementNames = new Set<String>();
+        
+        //create set with names of achievements in database
+        for(Achievement__c a: [SELECT Name FROM Achievement__c]){
+            if(!existingAchievementNames.contains(a.Name)){
+                existingAchievementNames.add(a.Name);
+            }
+        }
+        
+        //check if the new achievement is already in database
+        for(Achievement__c achievements: listOfAchievements){
+            if(existingAchievementNames.contains(achievements.Name)){
+                achievements.addError('ERROR: There is already an achievement with the same name: ' + achievements.Name);
+            }
+        }
+        return listOfAchievements;
+    }
+}
