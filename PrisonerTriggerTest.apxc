@@ -1,0 +1,32 @@
+@isTest
+public class PrisonerTriggerTest {
+    @isTest static void testNewPrisoner(){
+        
+        List<Prisoner__c> testPrisoners = new List<Prisoner__c> {
+            new Prisoner__c(First_Name__c='William', 
+                            Last_Name__c='Overbeck', 
+                            Start_Date__c=System.today(),
+                           	Status__c='Incarcerated'),
+            new Prisoner__c(First_Name__c='Kate', 
+                            Last_Name__c='Denson', 
+                            Start_Date__c=System.today()+2,
+                           	Status__c='In-Processing'),
+            new Prisoner__c(First_Name__c='David', 
+                            Last_Name__c='King', 
+                            Start_Date__c=System.today()+10,
+                           	Status__c='In-Processing')
+        };
+        
+        //Create Test Guards to test availability
+        List<Dungeon_Guard__c> testGuards = new List<Dungeon_Guard__c>();
+        /* Guards will need a user assigned. And some will need to be 
+         * assigned to a shift to test if the availability validation works
+         */    
+        
+        insert testPrisoners;
+            
+        List<Guard_Shift__c> actualShifts = [SELECT Id FROM Guard_Shift__c];
+        
+        System.assertEquals(3, actualShifts.size());
+    }
+}

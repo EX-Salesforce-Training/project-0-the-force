@@ -1,0 +1,54 @@
+public class PrisonerTriggerHandler{
+    
+    public static void createGuardShift(List<Prisoner__c> newPrisoners){
+        
+        List<Guard_Shift__c> newGuardShifts= new List<Guard_Shift__c>();
+        
+        //Bulkify
+        for(Prisoner__c newPrisoner: newPrisoners){
+            //Create an initial guard shift for the prisoner
+			
+            Guard_Shift__c firstShift = new Guard_Shift__c();
+        	
+            //Fill info with Prisoner data
+            firstShift.Prisoner__c = newPrisoner.Id;
+            firstShift.Start_Date__c = newPrisoner.Start_Date__c;
+            //If start date is not today, set scheduled
+            //If start date is today or before, set in progress
+            if(newPrisoner.Start_Date__c <= System.today()){
+                firstShift.Status__c = 'In Progress';
+            }else{
+                firstShift.Status__c = 'Scheduled';
+            }
+            
+            //Check if any guards have shifts with end dates
+            List<Guard_Shift__c> shifts= [SELECT Id,Dungeon_Guard__c FROM Guard_Shift__c WHERE Status__c = 'In Progress' OR Status__c = 'Scheduled'];
+            List<Dungeon_Guard__c> guards= [SELECT Id FROM Dungeon_Guard__c];
+            
+            for(Integer i=0; i<guards.size(); i++){
+                Boolean isOpen = false;
+                for(Guard_Shift__c s: shifts){
+                    if(s.Dungeon_Guard__c == guards[i].Id){
+                        if(s.End_Date__c < newPrisoner.Start_Date__c){
+                            isOpen = true;
+                        } else {
+                            isOpen = false;
+                        }                        
+                    }
+                }
+                if(isOpen){
+                    firstShift.Dungeon_Guard__c = guards[i].Id;
+                    i=guards.size();
+                }
+            }
+            
+            //firstShift.Dungeon_Guard__c = 'a045Y00000nNOnSQAW';
+
+            //Add to new shifts list
+			newGuardShifts.add(firstshift);            
+        }
+        
+        insert newGuardShifts;
+    }
+    
+}
