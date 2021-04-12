@@ -1,0 +1,17 @@
+//This particular trigger is designed to block any editing of the Stored Item type of records unless the 'Edit Info Authorized' 
+// checkbox is checked. I want the records to be editable by lower level members of the team so that mgmt don't have to 
+// be responsible for every single note about a type of item, but I want to effectively be able to lock records from editing
+// if that account team designates this as necessary -> so I don't want to simple restrict access to the account
+
+trigger ItemEditAuthorizationTrigger on Item__c (before update) {
+    
+        for(Item__c item : trigger.new){
+           
+            if(item.Edit_Info_Authorized__c == false){
+            
+            item.addError('Not Authorized to Edit - Seek Permission From Accounts Team');
+            }
+        }
+    }
+
+
