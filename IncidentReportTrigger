@@ -1,23 +1,10 @@
 trigger IncidentReportTrigger on Incident__c (after insert){
-
-List<Action_Order__c> assignedOrdersToProcess = new List<Action_Order__c>();
- 
-List<Incident__c> newIncidentsCreated = [SELECT Department__c FROM Incident__c];
-    
-for (Incident__c ir : newIncidentsCreated){
-	String irdept = ir.Department__c;
-	if (irdept == 'Quality Control'){
-		Action_Order__c qc = new Action_Order__c();
-		qc.Assigned_To__c='Quality Control';
-		assignedOrdersToProcess.add(qc);
-		}
 	
-	if(irdept == 'Safety Team'){
-		Action_Order__c st = new Action_Order__c();
-		st.Assigned_To__c = 'Safety Team';
-		assignedOrdersToProcess.add(st);
-		}
-}
-insert assignedOrdersToProcess;
+    IncidentReportTriggerHandler irth = new IncidentReportTriggerHandler();
+    
+    if(Trigger.isInsert){
+        irth.afterInsertMethod(trigger.new);
+        
+    }
 
 }
