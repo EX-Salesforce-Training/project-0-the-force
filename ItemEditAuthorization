@@ -5,13 +5,10 @@
 
 trigger ItemEditAuthorizationTrigger on Item__c (before update) {
     
-        for(Item__c item : trigger.new){
-           
-            if(item.Edit_Info_Authorized__c == false){
-            
-            item.addError('Not Authorized to Edit - Seek Permission From Accounts Team');
-            }
+        ItemEditAuthorizationHandler itemHandler = new ItemEditAuthorizationHandler();
+    
+   		 if(Trigger.isUpdate){
+        	itemHandler.beforeUpdateMethod(trigger.new);
+   		 }
+    
         }
-    }
-
-
