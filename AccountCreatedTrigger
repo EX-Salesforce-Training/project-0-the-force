@@ -1,28 +1,9 @@
 trigger AccountCreatedTrigger on Account (after insert) {
    
-    for(Account newlyCreated : [SELECT Id,Name,Owner.email FROM Account Where Id IN: trigger.new]){
+    AccountCreatedTriggerHandler acctHand = new AccountCreatedTriggerHandler();
     
-        //list of emails that will end up being used in the setToAddress
-        List<String> recipients = new List<String>();
-        
-        recipients.add(newlyCreated.Owner.email);
-      
-        //my understanding of the sendemail method is that we need a master list of single emails that we need to send
-        //the below is that list
-        
-        List<Messaging.SingleEmailMessage> masterMailList = new List<Messaging.SingleEmailMessage>();
-        
-        //individual email to be built then sent
-        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-    	
- 	       
-        mail.setSubject('Account Created');
-        mail.setToAddresses(recipients);
-        mail.setPlainTextBody('Account ' + newlyCreated.Name + ' has been successfully created');
-        
-        //add mail to list ->think putting individual envelope into mailbox
-        masterMailList.add(mail);
-        
-        Messaging.sendEmail(masterMailList);
+    if(Trigger.isInsert){
+        acctHand.afterInsertMethod(trigger.new);
     }
+    
 }
