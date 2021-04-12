@@ -1,0 +1,48 @@
+//Abdulloh Yoldoshev
+//Test for Achievement Trigger
+@isTest
+public class AchievementTriggerTest {
+    @isTest static void singleTest(){
+        
+        //Single Negative test
+        Achievement__c a = new Achievement__c(Name='TestAchievement');
+        insert a;
+        
+        //Single Positive test
+        Achievement__c a2 = new Achievement__C(Name='TestAchievement');
+        integer numFailed = 0;
+        if(!Database.insert(a2, false).isSuccess()){
+            numFailed = 1;
+        }
+        System.assertEquals(1, numFailed);
+    }
+    
+    @isTest static void bulkTest(){
+        List<Achievement__c> uniqueAchievements = new List<Achievement__c>();
+        List<Achievement__c> duplicateAchievements = new List<Achievement__c>();
+        
+        //create 150 unique and 150 same name achievements
+        for(Integer i = 0; i<300; i++){
+            if(i<150){
+                uniqueAchievements.add(new Achievement__c(Name = 'Achievement'+i));
+            }
+            else {
+                duplicateAchievements.add(new Achievement__c(Name = 'Achievement1'));
+            }
+        }
+            
+            //negative test
+            insert uniqueAchievements;
+            
+            //positive test
+            List<Database.SaveResult> results = Database.insert(duplicateAchievements, false);
+        	Integer numFailed = 0;
+        	for(Database.SaveResult sr : results){
+            if(!sr.isSuccess()){
+                numFailed += 1;
+            }
+        }
+        System.assertEquals(150, numFailed);
+        
+    }
+}
