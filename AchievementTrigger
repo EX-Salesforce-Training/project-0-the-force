@@ -1,0 +1,28 @@
+//Trigger for Achievement object
+trigger AchievementTrigger on Achievement__c (before insert) {
+switch on trigger.operationType{
+        
+    	//Call the method to check for existing achievemnts before inserts
+    	when BEFORE_INSERT{
+            AchievementTriggerHandler.checkForExisting(trigger.new);
+        }
+       /* when BEFORE_UPDATE{
+            
+        }
+        When BEFORE_DELETE{
+            
+        }
+        when AFTER_INSERT{
+            
+        }
+        when AFTER_UPDATE{
+            
+        }
+        when AFTER_DELETE{
+            
+        }
+        when AFTER_UNDELETE{
+            
+        }*/
+    }
+}
