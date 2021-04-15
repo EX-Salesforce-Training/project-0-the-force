@@ -1,0 +1,20 @@
+public class DungeonGuardTriggerHandler{
+    
+	public static void createGuardAssignment(List<Dungeon_Guard__c> newGuards){
+        List<Task> newTasks= new List<Task>();
+        Group q =[SELECT Id FROM Group WHERE type='Queue'];
+
+        for(Dungeon_Guard__c newGuard: newGuards){
+            if(newGuard.Dungeon__c == null){
+                Task t = new Task(Subject= 'Other',
+                                  Status = 'Not Started',
+                                  Priority = 'Normal',
+                                  OwnerId = q.Id,
+                                  Description = newGuard.Name + 'needs to be assigned to a dungeon.');
+                newTasks.add(t);
+            }     
+        }
+        
+        insert newTasks;
+    }
+}
