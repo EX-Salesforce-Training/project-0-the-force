@@ -1,0 +1,149 @@
+//
+// Name: LocationTriggerHandler
+// Author: Moises Acevedo, Team Vanquish
+// Created: 04/12/21
+// Updated: ""
+// Description: Logic for the LocationTrigger
+//
+///////////////////////////////////////////////////////////////
+
+
+public class LocationTriggerHandler {
+    
+    public static void LocDeletionPrevention(List<Location__c> fullLoc){
+        // List query of all locations with Inventory stored
+        List<Inventory__c> allLoc = [SELECT Location__r.name FROM Inventory__c];
+        
+        // Prevent deletion of Location if they have related inventories
+        for(Inventory__c I:allLoc){
+            if(Inventory__c ! = null){
+                I.addError('Cannot delete Locations with inventory still stored. You must delete the Inventory first.');
+            }
+        }
+    }
+}
+
+
+//Prevents the creation of multiple franchises in the same state
+public static void DuplicateFranchiseLocationCheck(){
+    
+    
+    SELECT Location__c FROM Location__c
+        
+        }
+
+
+
+//
+// Name: AccountTriggerHandler
+// Author: Moises Acevedo, Team Vanquish
+// Created: 04/11/21
+// Updated: ""
+// Description: Logic for the AccountTrigger
+//
+///////////////////////////////////////////////////////////////
+
+public class AccountTriggerHandler {
+    
+    //Allocating a list so i can add all the account names
+    public static List<Account> accList = new List<Account>();
+    
+   // creating the method that will check for duplicate Account names 
+    public static List<Account> CheckForSameNames(List<Account> newAccounts){
+        // create a list for the newly created account names
+        Set<String> newAcc = new Set<String>();
+        
+        // control flow that adds all new account names to the previosuly created set
+        for(Account acc:newAccounts){
+            newAcc.add(acc.name);
+        }
+       
+        
+        //Query for exisiting account names and add them to the allocated list
+        for(Account exAcct:[SELECT name, id FROM Account]){
+            accList.add(exAcct);
+        }
+        //Compare the new Accounts to the old Accounts to verify there are no dupes
+        for(Account accts:newAccounts){
+            Account dupeAcct = accList.get(newAcc.name);
+            if(dupeAcct ! = null){
+                newAcc.addError('Error: the Account name is already in use ' + dupeacct.Name + ' Please use a different name');
+            }
+        }
+        //DML statements that complete the trigger's task
+		 insert newAcc;
+		 update newAcc;
+
+    }
+} 
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////
+//
+// Name: AccountTrigger
+// Author: Moises Acevedo, Team Vanquish
+// Created: 11/19/19
+// Updated: 04/08/21
+// Description: Creating an apex trigger that fires when a duplicate account is being made
+//
+///////////////////////////////////////////////////////////////
+
+
+trigger AccountTrigger on Account (before insert, before update) {
+    
+    //Using switch statement to determine the context the trigger is operating in
+    switch on trigger.operationType {
+        
+        when BEFORE_INSERT(){
+            AccountTriggerHandler.CheckForSameNames(trigger.new);
+        }
+        
+        when BEFORE_UPDATE(){
+            AccountTriggerHandler.CheckForSameNames(trigger.new);
+        }
+        
+        
+    }
+
+}
+
+
+
+
+//
+// Name: LocationTrigger
+// Author: Moises Acevedo, Team Vanquish
+// Created: 04/12/21
+// Updated: ""
+// Description: Trigger that fires when a location record is about to be deleted (before) but still has inventories related to that record
+// 				This trigger will also implement a method before insert/update when a new location record is being created in the same location as another record
+//
+///////////////////////////////////////////////////////////////
+
+
+
+
+trigger LocationTrigger on Location__c (before insert, before update, before delete) {
+    
+    switch on trigger.operationType{
+        
+        when BEFORE_INSERT(){
+            
+        }
+        
+        when BEFORE_UPDATE(){
+            
+        }
+        
+        when BEFORE_DELETE() {
+            
+            
+        }
+    }
+    
+    
+}
