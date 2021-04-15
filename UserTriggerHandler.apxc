@@ -1,0 +1,17 @@
+public class UserTriggerHandler {
+    public static void createDungeonGuard(List<User> newUsers){
+        List<Dungeon_Guard__c> newGuards= new List<Dungeon_Guard__c>();
+        Profile p = [SELECT Id FROM Profile WHERE Name='Dungeon Guard'];
+        
+        for(User newGuard: newUsers){
+            if(newGuard.ProfileId == p.Id){
+                Dungeon_Guard__c g = new Dungeon_Guard__c(Name = newGuard.Name,
+                                                      	  Name__c = newGuard.id);
+                newGuards.add(g);
+            }     
+        }
+        
+        insert newGuards;
+        //possbly trigger event to send dungeon managers a task to assign the guard.
+    }
+}

@@ -1,0 +1,50 @@
+@isTest 
+public class UserTriggerTest {
+
+    @isTest static void testNewGuard(){
+        //create detailed list of users to insert.
+        List<User> testUsers = new List<User>();
+        Profile p = [SELECT Id FROM Profile WHERE Name='Custom-Dungeon Guard'];
+        Profile s = [SELECT Id FROM Profile WHERE Name='Standard User'];
+        
+        for (integer i = 0; i<5; i++){
+          User u = new User(Alias = 'User' + i, 
+                   Email= 'User' + i + '@cunning-fox-wrr40n.com', 
+                   EmailEncodingKey='UTF-8', 
+                   LastName='Testing', 
+                   LanguageLocaleKey='en_US', 
+                   LocaleSidKey='en_US', 
+                   ProfileId = p.Id, 
+                   TimeZoneSidKey='America/New_York', 
+                   UserName= 'User' + i + '@cunning-fox-wrr40n.com');
+            testUsers.add(u);
+        }
+                                      
+        for (integer o = 5; o<10; o++){
+          User u = new User(Alias = 'User' + o, 
+                   Email= 'User' + o + '@cunning-fox-wrr40n.com', 
+                   EmailEncodingKey='UTF-8', 
+                   LastName='Testing', 
+                   LanguageLocaleKey='en_US', 
+                   LocaleSidKey='en_US', 
+                   ProfileId = s.Id, 
+                   TimeZoneSidKey='America/New_York', 
+                   UserName= 'User' + o + '@cunning-fox-wrr40n.com');
+            testUsers.add(u);
+        }
+                                      
+        insert testUsers;
+        
+        List<Dungeon_Guard__c> actualGuards = [SELECT Id FROM Dungeon_Guard__c];
+        
+        /* This will need to be updated to test if NEW shifts are made, 
+         * not just if 3 shifts exist.
+         * Check if errors are thrown if no guards are available
+         * 
+        */
+
+        System.assertEquals(5, actualGuards.size());
+        //Is a dungeon guard created for the dungeon guard users?
+        //Is a dungeon guard not created for the non guard users?
+    }
+}
